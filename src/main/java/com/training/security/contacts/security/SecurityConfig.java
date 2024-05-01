@@ -1,6 +1,5 @@
 package com.training.security.contacts.security;
 
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +14,6 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-//@AllArgsConstructor
 public class SecurityConfig {
 
     @Autowired
@@ -24,14 +22,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeRequests()
-            .requestMatchers(HttpMethod.DELETE).hasRole("ADMIN")
-            .anyRequest().authenticated()
-            .and()
-            .httpBasic();
-            // In case a session exits, need to disable session creation on spring security
-            //.and()
-                //.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+            .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers(HttpMethod.DELETE, "/delete/*/contact").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST).hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.GET).permitAll()
+                        .anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
