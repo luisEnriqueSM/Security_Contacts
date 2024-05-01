@@ -1,1 +1,1 @@
-# Security_Contacts, apply Spring Security
+# Security_Contacts, applying Basic Auth with Spring Security
